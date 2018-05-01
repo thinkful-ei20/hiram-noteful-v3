@@ -10,7 +10,10 @@ router.get(`/`, (req, res, next) => {
   const { searchTerm } = req.query
 
   let filter = {}
-  if (searchTerm) filter.title = { $regex: new RegExp(searchTerm, `i`) }
+  if (searchTerm) {
+    const re = new RegExp(searchTerm, `i`)
+    filter = { $or: [{ title: { $regex: re } }, { content: { $regex: re } }] }
+  }
 
   Note.find(filter)
     .sort(`created`)
@@ -59,14 +62,27 @@ router.post(`/`, (req, res, next) => {
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put(`/:id`, (req, res, next) => {
-  console.log(`Update a Note`)
-  res.json({ id: 1, title: `Updated Temp 1` })
+  const { id } = req.params
+
+  const updateObj = {}
+  const updatableFields = [`title`, `content`]
+
+  for (const field of updatableFields) {
+    if (field in req.body) updateObj[field] = req.body[field]
+  }
+
+  Note.findByIdAndUpdate(id, { $set: { ...updateObj, updatedAt: Date.now() } })
+    .then(note => res.status(204).end())
+    .catch(next)
 })
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete(`/:id`, (req, res, next) => {
-  console.log(`Delete a Note`)
-  res.status(204).end()
+  const { id } = req.params
+
+  Note.findByIdAndRemove(id)
+    .then(note => res.status(204).end())
+    .catch(next)
 })
 
 module.exports = router
