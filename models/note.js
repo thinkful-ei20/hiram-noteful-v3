@@ -1,11 +1,14 @@
 const mongoose = require(`mongoose`)
 
-const noteSchema = mongoose.Schema({
-  title: { type: String, required: true },
-  content: String,
-  createdAt: { type: Date, default: Date.now() },
-  updatedAt: Date
-})
+const noteSchema = mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    content: String
+  },
+  {
+    timestamps: true
+  }
+)
 
 noteSchema.set(`toObject`, {
   transform: (doc, ret) => {
