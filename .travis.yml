@@ -1,10 +1,9 @@
 language: node_js
 node_js: node
-
-# deploy:
-#     provider: heroku
-#     api_key:
-#       secure: [YOUR-API-KEY]
-#     app: [YOUR-APP-NAME]
-#     on:
-#       repo: [YOUR-APP-REPO]
+deploy:
+  provider: heroku
+  api_key:
+    secure: P9bp8toIhbpTKMiMxpsJjKgiUiiwQUiZ+Yp8EB4aBNbmwIN1w+AIQ8Q5Rn7i8tmz9rgRZwbpAhGH+hbdzlDLnP/6PZBd3CghMfBzINALvh1kbsC072gor4XkbThySwUWS5tWebmY0e6rCDDMXnQoSIvPTfIIOxBEY+QyU0WR1vZi+fVv2tpc9MtEmH0EOgL3f2A2xHEQ439q6a97aI+PP3i2zVyf2jWMTvI+kv2vUTA+al6URQKC4qfEVeFqw0GoKFz2IBNmJGbNcNOiY2yXgof09WSSQsbmHD6muZdboWoNw37kcLq3uHTGFB5ICGMvzpByzEUBk5fWMVllFXXq546XVDBheERorjkc8ZAVD6k8Wg5EqTQGoo6jHhaMeHzK5SE7hzFvZrsBMO8rgJTLt1DFzGeE1VGGLZogXZFnIYyzjng0R++2ptkomc+WnuBY/l7JSzr+8INnXSas9bSfQGluPrYKEJ6V2cztM1UpFTpUf6szpF0IGgj+ZMCVGEfIWLm31/Z4guspVvECqYl5bUBjEhHsDIonUXaE3MPJR0eVZVv1qdAiDeAkp6zd7N7uyBsqaEVaczuKbdnOHkMhs64WOp1zOrJ4Dz6dVbliIhfbXApNEAcViOr6CEHNyD1BEiWld6rf4D20OgL6k0rg9QW8fT325pqRih4ntSvE1IE=
+  app: hiram-noteful-v3
+  on:
+    repo: thinkful-ei20/hiram-noteful-v3
