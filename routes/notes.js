@@ -71,8 +71,10 @@ router.put(`/:id`, (req, res, next) => {
     if (field in req.body) updateObj[field] = req.body[field]
   }
 
-  Note.findByIdAndUpdate(id, { $set: updateObj })
-    .then(note => res.status(204).end())
+  Note.findByIdAndUpdate(id, { $set: updateObj }, { new: true })
+    .then(note => {
+      res.json(note)
+    })
     .catch(next)
 })
 
