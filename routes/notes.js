@@ -45,7 +45,7 @@ router.post(`/`, (req, res, next) => {
   }
 
   if (!newItem.title) {
-    const err = new Error(`'title' field missing`)
+    const err = new Error(`Missing \`title\` in request body`)
     err.status = 400
     return next(err)
   }
