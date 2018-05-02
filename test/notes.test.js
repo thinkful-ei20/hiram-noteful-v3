@@ -19,7 +19,7 @@ const dropDatabase = () => {
   return mongoose.connection.db.dropDatabase()
 }
 
-describe.only(`Notes endpoints`, () => {
+describe(`Notes endpoints`, () => {
   before(() => {
     return mongoose.connect(TEST_DATABASE_URI)
   })
@@ -44,7 +44,7 @@ describe.only(`Notes endpoints`, () => {
           count = _count
           return chai.request(app).get(`/api/notes`)
         })
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200)
           expect(res).to.be.json
           expect(res.body).to.be.a(`array`)
@@ -56,7 +56,7 @@ describe.only(`Notes endpoints`, () => {
       return chai
         .request(app)
         .get(`/api/notes`)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200)
           expect(res).to.be.json
           expect(res.body).to.be.a(`array`)
@@ -66,7 +66,7 @@ describe.only(`Notes endpoints`, () => {
               `id`,
               `title`,
               `content`,
-              `createAt`,
+              `createdAt`,
               `updatedAt`
             )
           })
@@ -88,7 +88,7 @@ describe.only(`Notes endpoints`, () => {
           return Note.find({ title: /(car)/i })
         })
         .then(data => {
-          expect(res.body[0].id).to.eq(data.id)
+          expect(res.body[0].id).to.eq(data[0].id)
         })
     })
 
@@ -96,7 +96,7 @@ describe.only(`Notes endpoints`, () => {
       return chai
         .request(app)
         .get(`/api/notes?searchTerm=Not%20a%20Valid%20Search`)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200)
           expect(res).to.be.json
           expect(res.body).to.be.a(`array`)
@@ -107,11 +107,13 @@ describe.only(`Notes endpoints`, () => {
 
   describe(`GET /api/notes/:id`, () => {
     it(`should return correct notes`, () => {
-      const id = Note.findOne().id
+      const id = `000000000000000000000003`
+      let res
       return chai
         .request(app)
         .get(`/api/notes/${id}`)
-        .then(res => {
+        .then(_res => {
+          res = _res
           expect(res).to.have.status(200)
           expect(res).to.be.json
           expect(res.body).to.be.an(`object`)
@@ -122,8 +124,11 @@ describe.only(`Notes endpoints`, () => {
             `createdAt`,
             `updatedAt`
           )
-          expect(res.body.id).to.equal(id)
-          expect(res.body.title).to.equal(Note.findById(id).title)
+          return Note.findById(id)
+        })
+        .then(note => {
+          expect(res.body.id).to.eq(note.id)
+          expect(res.body.title).to.eq(note.title)
         })
     })
 
@@ -148,7 +153,7 @@ describe.only(`Notes endpoints`, () => {
         .request(app)
         .post(`/api/notes`)
         .send(newItem)
-        .then(function(res) {
+        .then(res => {
           body = res.body
           expect(res).to.have.status(201)
           expect(res).to.be.json
@@ -181,7 +186,7 @@ describe.only(`Notes endpoints`, () => {
           expect(res).to.have.status(400)
           expect(res).to.be.json
           expect(res.body).to.be.a(`object`)
-          expect(res.body.message).to.equal(`Missing \`title\` in request body`)
+          expect(res.body.message).to.eq(`Missing \`title\` in request body`)
         })
     })
   })
@@ -192,7 +197,7 @@ describe.only(`Notes endpoints`, () => {
         title: `What about dogs?!`,
         content: `woof woof`
       }
-      let id = Note.findOne().id
+      let id = `000000000000000000000003`
       let body
       return chai
         .request(app)
@@ -227,18 +232,18 @@ describe.only(`Notes endpoints`, () => {
     })
   })
 
-  describe(`DELETE  /api/notes/:id`, () => {
+  describe(`DELETE /api/notes/:id`, () => {
     it(`should delete an item by id`, () => {
-      const id = Note.findOne().id
+      const id = `000000000000000000000003`
       return chai
         .request(app)
         .delete(`/api/notes/${id}`)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(204)
           return Note.findById(id)
         })
         .then(note => {
-          expect(note).to.be(null)
+          expect(note).to.eq(null)
         })
     })
   })
