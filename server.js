@@ -44,23 +44,40 @@ app.use(function(err, req, res, next) {
   })
 })
 
-if (require.main === module) {
-  mongoose.connect(MONGODB_URI)
-    .then(instance => {
-      const conn = instance.connections[0]
-      console.info(`Connected to: mongodb://${conn.host}:${conn.port}/${conn.name}`)
+let server
+
+const runServer = (databaseURI, port = PORT) => {
+  return new Promise((resolve, reject) => {
+    mongoose.connect(databaseURI, err => {
+      if (err) return reject(err)
+
+      server = app
+        .listen(port, () => {
+          console.log(`Listening on port ${port}`)
+          resolve()
+        })
+        .on(`error`, err => {
+          mongoose.disconnect()
+          reject(err)
+        })
     })
-    .catch(err => {
-      console.error(`ERROR: ${err.message}`)
-      console.error(`\n === Didi you remember to start 'mongod'? === \n`)
-      console.error(err)
-    })
-  // Listen for incoming connections
-  app
-    .listen(PORT, function() {
-      console.info(`Server listening on ${this.address().port}`)
-    })
-    .on(`error`, err => {
-      console.error(err)
-    })
+  })
 }
+
+const closeServer = () => {
+  return mongoose.disconnect().then(() => {
+    return new Promise((resolve, reject) => {
+      console.log(`Closing server`)
+      server.close(err => {
+        if (err) return reject(err)
+        resolve()
+      })
+    })
+  })
+}
+
+if (require.main === module) {
+  runServer(MONGODB_URI).catch(err => console.error(err))
+}
+
+module.exports = { app, runServer, closeServer }
