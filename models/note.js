@@ -3,7 +3,7 @@ const mongoose = require(`mongoose`)
 const noteSchema = mongoose.Schema(
   {
     title: { type: String, required: true },
-    content: String,
+    content: { type: String, default: null },
     folderId: { type: mongoose.Schema.Types.ObjectId, ref: `Folder` }
   },
   {
