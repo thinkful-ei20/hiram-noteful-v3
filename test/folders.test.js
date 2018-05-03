@@ -2,7 +2,7 @@ const mongoose = require(`mongoose`)
 const chai = require(`chai`)
 const chaiHttp = require(`chai-http`)
 
-const Folder = require(`../models/folder`)
+const { Folder } = require(`../models/folder`)
 const seedFolders = require(`../db/seed/folders.json`)
 
 const { app } = require(`../server`)
@@ -19,7 +19,7 @@ const dropDatabase = () => {
   return mongoose.connection.db.dropDatabase()
 }
 
-describe(`Notes endpoints`, () => {
+describe(`Folders endpoints`, () => {
   before(() => {
     return mongoose.connect(TEST_DATABASE_URI)
   })
