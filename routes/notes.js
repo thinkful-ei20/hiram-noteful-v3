@@ -16,7 +16,7 @@ router.get(`/`, (req, res, next) => {
   }
 
   Note.find(filter)
-    .sort(`created`)
+    .sort(`createdAt`)
     .then(results => {
       res.json(results)
     })
