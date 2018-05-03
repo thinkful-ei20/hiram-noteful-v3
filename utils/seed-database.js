@@ -1,14 +1,25 @@
-const mongoose = require("mongoose");
+const mongoose = require(`mongoose`)
 
-const { MONGODB_URI } = require("../config");
-const { Note } = require("../models/note");
+const { MONGODB_URI } = require(`../config`)
+const { Note } = require(`../models/note`)
+const { Folder } = require(`../models/folder`)
 
-const seedNotes = require("../db/seed/notes");
+const seedNotes = require(`../db/seed/notes`)
+const seedFolders = require(`../db/seed/folders`)
 
 mongoose
   .connect(MONGODB_URI)
   .then(() => mongoose.connection.db.dropDatabase())
-  .then(() => Note.insertMany(seedNotes))
-  .then(results => console.info(`Inserted ${results.length} Notes`))
+  .then(() => {
+    return Promise.all([
+      Note.insertMany(seedNotes),
+      Folder.insertMany(seedFolders),
+      Folder.createIndexes()
+    ])
+  })
+  .then(([noteResult, folderResult, _]) => {
+    console.info(`Inserted ${noteResult.length} Notes`)
+    console.info(`Inserted ${folderResult.length} Folders`)
+  })
   .then(() => mongoose.disconnect())
-  .catch(console.error);
+  .catch(console.error)
