@@ -94,12 +94,12 @@ describe(`Folders endpoints`, () => {
         })
     })
 
-    it(`should respond with a 404 for an invalid id`, () => {
+    it(`should respond with a 400 for an invalid id`, () => {
       return chai
         .request(app)
         .get(`/DOES/NOT/EXIST`)
         .then(res => {
-          expect(res).to.have.status(404)
+          expect(res).to.have.status(400)
         })
     })
   })
@@ -148,6 +148,22 @@ describe(`Folders endpoints`, () => {
           expect(res.body.message).to.eq(`Missing \`name\` in request body`)
         })
     })
+
+    it(`should return an error when "name" already exists`, () => {
+      const newItem = {
+        name: `Work`
+      }
+      return chai
+        .request(app)
+        .post(`/api/folders`)
+        .send(newItem)
+        .then(res => {
+          expect(res).to.have.status(400)
+          expect(res).to.be.json
+          expect(res.body).to.be.a(`object`)
+          expect(res.body.message).to.eq(`The folder name already exists`)
+        })
+    })
   })
 
   describe(`PUT /api/folders/:id`, () => {
@@ -179,7 +195,7 @@ describe(`Folders endpoints`, () => {
         })
     })
 
-    it(`should respond with a 404 for an invalid id`, () => {
+    it(`should respond with a 400 for an invalid id`, () => {
       const updateItem = {
         name: `Who cares`
       }
@@ -188,7 +204,23 @@ describe(`Folders endpoints`, () => {
         .put(`/DOES/NOT/EXIST`)
         .send(updateItem)
         .then(res => {
-          expect(res).to.have.status(404)
+          expect(res).to.have.status(400)
+        })
+    })
+
+    it(`should return an error when "name" already exists`, () => {
+      const newItem = {
+        name: `Work`
+      }
+      return chai
+        .request(app)
+        .post(`/api/folders/111111111111111111111100`)
+        .send(newItem)
+        .then(res => {
+          expect(res).to.have.status(400)
+          expect(res).to.be.json
+          expect(res.body).to.be.a(`object`)
+          expect(res.body.message).to.eq(`The folder name already exists`)
         })
     })
   })
