@@ -3,7 +3,10 @@ const chaiHttp = require(`chai-http`)
 const mongoose = require(`mongoose`)
 
 const { Note } = require(`../models/note`)
-const seedNotes = require(`../db/seed/notes`)
+const noteSeed = require(`../db/seed/notes`)
+
+const { Folder } = require(`../models/folder`)
+const folderSeed = require(`../db/seed/folders`)
 
 const { app } = require(`../server`)
 const { TEST_DATABASE_URI } = require(`../config`)
@@ -11,25 +14,20 @@ const { TEST_DATABASE_URI } = require(`../config`)
 const expect = chai.expect
 chai.use(chaiHttp)
 
-const seedDatabase = () => {
-  return Note.insertMany(seedNotes).then(() => Note.createIndexes())
-}
-
-const dropDatabase = () => {
-  return mongoose.connection.db.dropDatabase()
-}
-
 describe(`Notes endpoints`, () => {
   before(() => {
     return mongoose.connect(TEST_DATABASE_URI)
   })
 
   beforeEach(() => {
-    return seedDatabase()
+    return Folder.insertMany(folderSeed)
+      .then(() => Folder.createIndexes())
+      .then(() => Note.insertMany(noteSeed))
+      .then(() => Note.createIndexes())
   })
 
   afterEach(() => {
-    return dropDatabase()
+    return mongoose.connection.db.dropDatabase()
   })
 
   after(() => {
@@ -66,6 +64,7 @@ describe(`Notes endpoints`, () => {
               `id`,
               `title`,
               `content`,
+              `folderId`,
               `createdAt`,
               `updatedAt`
             )
@@ -122,7 +121,8 @@ describe(`Notes endpoints`, () => {
             `title`,
             `content`,
             `createdAt`,
-            `updatedAt`
+            `updatedAt`,
+            `folderId`
           )
           return Note.findById(id)
         })
@@ -146,7 +146,8 @@ describe(`Notes endpoints`, () => {
     it(`should create and return a new item when provided valid data`, () => {
       const newItem = {
         title: `The best article about cats ever!`,
-        content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...`
+        content: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...`,
+        folderId: `111111111111111111111100`
       }
       let body
       return chai
@@ -163,7 +164,8 @@ describe(`Notes endpoints`, () => {
             `title`,
             `content`,
             `createdAt`,
-            `updatedAt`
+            `updatedAt`,
+            `folderId`
           )
           expect(res).to.have.header(`location`)
           return Note.findById(body.id)
@@ -194,7 +196,7 @@ describe(`Notes endpoints`, () => {
   describe(`PUT /api/notes/:id`, () => {
     it(`should update the note`, () => {
       const updateItem = {
-        title: `What about dogs?!`,
+        title: `What dogs?!`,
         content: `woof woof`
       }
       let id = `000000000000000000000003`

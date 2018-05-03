@@ -72,13 +72,13 @@ router.put(`/:id`, (req, res, next) => {
   const { id } = req.params
 
   const updateObj = {}
-  const updatableFields = [`title`, `content`]
+  const updatableFields = [`title`, `content`, `folderId`]
 
   for (const field of updatableFields) {
     if (field in req.body) updateObj[field] = req.body[field]
   }
 
-  if (newItem.folderId && !mongoose.Types.ObjectId(newItem.folderId)) {
+  if (updateObj.folderId && !mongoose.Types.ObjectId(newItem.folderId)) {
     const err = new Error(`Invalid \`folderId\` in request body`)
     err.status = 400
     return next(err)
