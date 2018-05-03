@@ -7,13 +7,14 @@ const { Note } = require(`../models/note`)
 
 /* ========== GET/READ ALL ITEM ========== */
 router.get(`/`, (req, res, next) => {
-  const { searchTerm } = req.query
+  const { searchTerm, folderId } = req.query
 
   let filter = {}
   if (searchTerm) {
     const re = new RegExp(searchTerm, `i`)
     filter = { $or: [{ title: { $regex: re } }, { content: { $regex: re } }] }
   }
+  if (folderId) filter.folderId = folderId
 
   Note.find(filter)
     .sort(`createdAt`)
@@ -39,13 +40,19 @@ router.get(`/:id`, (req, res, next) => {
 router.post(`/`, (req, res, next) => {
   let newItem = {}
 
-  const fields = [`title`, `content`]
+  const fields = [`title`, `content`, `folderId`]
   for (const field of fields) {
     if (field in req.body) newItem[field] = req.body[field]
   }
 
   if (!newItem.title) {
     const err = new Error(`Missing \`title\` in request body`)
+    err.status = 400
+    return next(err)
+  }
+
+  if (newItem.folderId && !mongoose.Types.ObjectId(newItem.folderId)) {
+    const err = new Error(`Invalid \`folderId\` in request body`)
     err.status = 400
     return next(err)
   }
@@ -69,6 +76,12 @@ router.put(`/:id`, (req, res, next) => {
 
   for (const field of updatableFields) {
     if (field in req.body) updateObj[field] = req.body[field]
+  }
+
+  if (newItem.folderId && !mongoose.Types.ObjectId(newItem.folderId)) {
+    const err = new Error(`Invalid \`folderId\` in request body`)
+    err.status = 400
+    return next(err)
   }
 
   Note.findByIdAndUpdate(id, { $set: updateObj }, { new: true })
