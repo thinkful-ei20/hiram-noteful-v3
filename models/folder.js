@@ -15,5 +15,5 @@ folderSchema.set(`toObject`, {
   }
 })
 
-const Folder = mongoose.model(`folder`, folderSchema)
+const Folder = mongoose.model(`Folder`, folderSchema)
 module.exports = { Folder }

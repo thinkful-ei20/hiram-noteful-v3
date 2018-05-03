@@ -4,6 +4,7 @@ const express = require(`express`)
 const router = express.Router()
 const mongoose = require(`mongoose`)
 const { Folder } = require(`../models/folder`)
+const { Note } = require(`../models/note`)
 
 /* ========== GET/READ ALL ITEM ========== */
 router.get(`/`, (req, res, next) => {
@@ -84,8 +85,15 @@ router.put(`/:id`, (req, res, next) => {
 router.delete(`/:id`, (req, res, next) => {
   const { id } = req.params
 
-  Folder.findByIdAndRemove(id)
-    .then(item => res.status(204).end())
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    const err = new Error(`id is invalid`)
+    err.status = 400
+    return next(err)
+  }
+
+  Note.updateMany({ folderId: id }, { $unset: { folderId: `` } })
+    .then(() => Folder.findByIdAndRemove(id))
+    .then(() => res.status(204).end())
     .catch(next)
 })
 
