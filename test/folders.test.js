@@ -97,7 +97,7 @@ describe(`Folders endpoints`, () => {
     it(`should respond with a 400 for an invalid id`, () => {
       return chai
         .request(app)
-        .get(`/DOES/NOT/EXIST`)
+        .get(`/api/folders/200`)
         .then(res => {
           expect(res).to.have.status(400)
         })
@@ -201,7 +201,7 @@ describe(`Folders endpoints`, () => {
       }
       return chai
         .request(app)
-        .put(`/DOES/NOT/EXIST`)
+        .put(`/api/folders/200`)
         .send(updateItem)
         .then(res => {
           expect(res).to.have.status(400)
@@ -214,7 +214,7 @@ describe(`Folders endpoints`, () => {
       }
       return chai
         .request(app)
-        .post(`/api/folders/111111111111111111111100`)
+        .put(`/api/folders/111111111111111111111100`)
         .send(newItem)
         .then(res => {
           expect(res).to.have.status(400)
