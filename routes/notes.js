@@ -85,16 +85,26 @@ router.put(`/:id`, (req, res, next) => {
   const { id } = req.params
 
   const updateObj = {}
-  const updatableFields = [`title`, `content`, `folderId`]
+  const updatableFields = [`title`, `content`, `folderId`, `tags`]
 
   for (const field of updatableFields) {
     if (field in req.body) updateObj[field] = req.body[field]
   }
 
-  if (updateObj.folderId && !mongoose.Types.ObjectId(newItem.folderId)) {
+  if (updateObj.folderId && !mongoose.Types.ObjectId(updateObj.folderId)) {
     const err = new Error(`Invalid \`folderId\` in request body`)
     err.status = 400
     return next(err)
+  }
+
+  if (updateObj.tags) {
+    for (const tag of updateObj.tags) {
+      if (!mongoose.Types.ObjectId(tag)) {
+        const err = new Error(`Invalid tagId in \`tags\`: ${tag}`)
+        err.status = 400
+        return next(err)
+      }
+    }
   }
 
   Note.findByIdAndUpdate(id, { $set: updateObj }, { new: true })
