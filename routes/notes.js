@@ -7,7 +7,7 @@ const { Note } = require(`../models/note`)
 
 /* ========== GET/READ ALL ITEM ========== */
 router.get(`/`, (req, res, next) => {
-  const { searchTerm, folderId } = req.query
+  const { searchTerm, folderId, tagId } = req.query
 
   let filter = {}
   if (searchTerm) {
@@ -15,8 +15,10 @@ router.get(`/`, (req, res, next) => {
     filter = { $or: [{ title: { $regex: re } }, { content: { $regex: re } }] }
   }
   if (folderId) filter.folderId = folderId
+  if (tagId) filter.tags = tagId
 
   Note.find(filter)
+    .populate(`tags`)
     .sort(`createdAt`)
     .then(results => {
       res.json(results)
@@ -29,6 +31,7 @@ router.get(`/:id`, (req, res, next) => {
   const { id } = req.params
 
   Note.findById(id)
+    .populate(`tags`)
     .then(result => {
       if (result) res.json(result)
       else next()
@@ -40,7 +43,7 @@ router.get(`/:id`, (req, res, next) => {
 router.post(`/`, (req, res, next) => {
   let newItem = {}
 
-  const fields = [`title`, `content`, `folderId`]
+  const fields = [`title`, `content`, `folderId`, `tags`]
   for (const field of fields) {
     if (field in req.body) newItem[field] = req.body[field]
   }
@@ -55,6 +58,16 @@ router.post(`/`, (req, res, next) => {
     const err = new Error(`Invalid \`folderId\` in request body`)
     err.status = 400
     return next(err)
+  }
+
+  if (newItem.tags) {
+    for (const tag of newItem.tags) {
+      if (!mongoose.Types.ObjectId(tag)) {
+        const err = new Error(`Invalid tagId in \`tags\`: ${tag}`)
+        err.status = 400
+        return next(err)
+      }
+    }
   }
 
   Note.create(newItem)

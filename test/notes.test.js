@@ -8,6 +8,9 @@ const noteSeed = require(`../db/seed/notes`)
 const { Folder } = require(`../models/folder`)
 const folderSeed = require(`../db/seed/folders`)
 
+const { Tag } = require(`../models/tag`)
+const tagSeed = require(`../db/seed/tags`)
+
 const { app } = require(`../server`)
 const { TEST_DATABASE_URI } = require(`../config`)
 
@@ -22,6 +25,8 @@ describe(`Notes endpoints`, () => {
   beforeEach(() => {
     return Folder.insertMany(folderSeed)
       .then(() => Folder.createIndexes())
+      .then(() => Tag.insertMany(tagSeed))
+      .then(() => Tag.createIndexes())
       .then(() => Note.insertMany(noteSeed))
       .then(() => Note.createIndexes())
   })
@@ -66,7 +71,8 @@ describe(`Notes endpoints`, () => {
               `content`,
               `folderId`,
               `createdAt`,
-              `updatedAt`
+              `updatedAt`,
+              `tags`
             )
           })
         })
@@ -122,7 +128,8 @@ describe(`Notes endpoints`, () => {
             `content`,
             `createdAt`,
             `updatedAt`,
-            `folderId`
+            `folderId`,
+            `tags`
           )
           return Note.findById(id)
         })
@@ -165,7 +172,8 @@ describe(`Notes endpoints`, () => {
             `content`,
             `createdAt`,
             `updatedAt`,
-            `folderId`
+            `folderId`,
+            `tags`
           )
           expect(res).to.have.header(`location`)
           return Note.findById(body.id)
